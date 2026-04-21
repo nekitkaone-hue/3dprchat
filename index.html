@@ -12,6 +12,7 @@ body{
     background:#f6f7fb;
 }
 
+/* HEADER */
 header{
     position:sticky;
     top:0;
@@ -19,8 +20,10 @@ header{
     padding:16px;
     font-weight:700;
     border-bottom:1px solid #eee;
+    cursor:pointer;
 }
 
+/* GRID */
 .container{
     padding:15px;
     display:grid;
@@ -48,7 +51,7 @@ button{
 .add{background:green;color:white;}
 .desc{background:#4da6ff;color:white;}
 
-/* CART BUTTON */
+/* CART */
 #cartBtn{
     position:fixed;
     right:15px;
@@ -59,7 +62,6 @@ button{
     border-radius:12px;
 }
 
-/* CART */
 #cart{
     position:fixed;
     right:-380px;
@@ -80,10 +82,9 @@ button{
     align-items:center;
     padding:10px 0;
     border-bottom:1px solid #eee;
-    font-size:14px;
 }
 
-/* qty block */
+/* qty */
 .qty{
     display:flex;
     align-items:center;
@@ -93,24 +94,27 @@ button{
 .qty button{
     width:26px;
     height:26px;
+    background:#eee;
     display:flex;
     align-items:center;
     justify-content:center;
     font-size:16px;
-    background:#eee;
 }
 
-/* 🔴 FIXED DELETE BUTTON (now visible) */
+/* delete */
 .del{
     width:26px;
     height:26px;
-    background:#ff3b30 !important;
+    background:#ff3b30;
     color:white;
     font-size:14px;
-    font-weight:bold;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+}
+
+/* CLEAR */
+.clear{
+    background:#ff3b30;
+    color:white;
+    margin-top:10px;
 }
 
 /* overlay */
@@ -127,7 +131,7 @@ button{
     visibility:visible;
 }
 
-/* POPUP DESCRIPTION FIXED */
+/* popup */
 #popup{
     position:fixed;
     inset:0;
@@ -148,7 +152,10 @@ button{
 
 <body>
 
-<header>NEON || 3D Печать</header>
+<!-- HEADER (CLICK = RELOAD) -->
+<header onclick="reloadPage()">
+    NEON || 3D Печать
+</header>
 
 <div id="cartBtn" onclick="toggleCart()">🛒 <span id="count">0</span></div>
 <div id="overlay" onclick="toggleCart()"></div>
@@ -161,12 +168,10 @@ button{
     <div id="items"></div>
     <p id="total">Итого: 0 ₽</p>
 
-    <button onclick="clearCart()" style="background:#ff3b30;color:white;">
-        Очистить корзину
-    </button>
+    <button class="clear" onclick="clearCart()">Очистить корзину</button>
 </div>
 
-<!-- DESCRIPTION POPUP -->
+<!-- POPUP -->
 <div id="popup">
     <div class="popupBox">
         <h3 id="pname"></h3>
@@ -177,6 +182,11 @@ button{
 </div>
 
 <script>
+
+/* RELOAD HEADER */
+function reloadPage(){
+    location.reload();
+}
 
 /* PRODUCTS */
 let products=[
@@ -210,7 +220,7 @@ function add(i){
     update();
 }
 
-/* PLUS MINUS */
+/* QTY */
 function plus(i){
     cart[i].qty++;
     save();
@@ -224,7 +234,7 @@ function minus(i){
     update();
 }
 
-/* DELETE */
+/* REMOVE */
 function remove(i){
     cart.splice(i,1);
     save();
@@ -246,7 +256,6 @@ function render(){
         <div class="card">
             <b>${p.name}</b><br>
             ${p.price} ₽
-
             <button class="add" onclick="add(${i})">В корзину</button>
             <button class="desc" onclick="show(${i})">Описание</button>
         </div>`;
@@ -254,7 +263,7 @@ function render(){
     document.getElementById("shop").innerHTML=html;
 }
 
-/* CART UPDATE FIXED */
+/* CART UPDATE */
 function update(){
     let html="";
     let sum=0;
@@ -288,7 +297,7 @@ function update(){
     document.getElementById("count").innerText=count;
 }
 
-/* DESCRIPTION FIXED (popup) */
+/* DESCRIPTION */
 function show(i){
     document.getElementById("popup").style.display="flex";
     document.getElementById("pname").innerText=products[i].name;
@@ -300,7 +309,7 @@ function closePopup(){
     document.getElementById("popup").style.display="none";
 }
 
-/* CART */
+/* CART TOGGLE */
 function toggleCart(){
     document.getElementById("cart").classList.toggle("open");
     document.getElementById("overlay").classList.toggle("show");
