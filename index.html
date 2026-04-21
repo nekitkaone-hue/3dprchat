@@ -12,7 +12,6 @@ body{
     background:#f6f7fb;
 }
 
-/* HEADER */
 header{
     position:sticky;
     top:0;
@@ -23,7 +22,6 @@ header{
     cursor:pointer;
 }
 
-/* GRID */
 .container{
     padding:15px;
     display:grid;
@@ -38,7 +36,6 @@ header{
     box-shadow:0 6px 18px rgba(0,0,0,0.08);
 }
 
-/* buttons */
 button{
     width:100%;
     margin-top:6px;
@@ -84,7 +81,6 @@ button{
     border-bottom:1px solid #eee;
 }
 
-/* qty */
 .qty{
     display:flex;
     align-items:center;
@@ -95,19 +91,13 @@ button{
     width:26px;
     height:26px;
     background:#eee;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:16px;
 }
 
-/* delete */
 .del{
     width:26px;
     height:26px;
     background:#ff3b30;
     color:white;
-    font-size:14px;
 }
 
 /* CLEAR */
@@ -115,6 +105,13 @@ button{
     background:#ff3b30;
     color:white;
     margin-top:10px;
+}
+
+/* ORDER BUTTON (RESTORED) */
+.order{
+    background:#111;
+    color:white;
+    margin-top:8px;
 }
 
 /* overlay */
@@ -152,10 +149,7 @@ button{
 
 <body>
 
-<!-- HEADER (CLICK = RELOAD) -->
-<header onclick="reloadPage()">
-    NEON || 3D Печать
-</header>
+<header onclick="reloadPage()">NEON || 3D Печать</header>
 
 <div id="cartBtn" onclick="toggleCart()">🛒 <span id="count">0</span></div>
 <div id="overlay" onclick="toggleCart()"></div>
@@ -169,6 +163,9 @@ button{
     <p id="total">Итого: 0 ₽</p>
 
     <button class="clear" onclick="clearCart()">Очистить корзину</button>
+
+    <!-- 🔥 RESTORED ORDER BUTTON -->
+    <button class="order" onclick="order()">Оформить заказ</button>
 </div>
 
 <!-- POPUP -->
@@ -183,12 +180,10 @@ button{
 
 <script>
 
-/* RELOAD HEADER */
 function reloadPage(){
     location.reload();
 }
 
-/* PRODUCTS */
 let products=[
     {name:"Ваза спираль",price:600,desc:"Декоративная ваза",size:"140×139×219 мм"},
     {name:"Бюст Сталина",price:1200,desc:"Классический бюст",size:"176×128×245 мм"},
@@ -234,14 +229,12 @@ function minus(i){
     update();
 }
 
-/* REMOVE */
 function remove(i){
     cart.splice(i,1);
     save();
     update();
 }
 
-/* CLEAR */
 function clearCart(){
     cart=[];
     save();
@@ -256,6 +249,7 @@ function render(){
         <div class="card">
             <b>${p.name}</b><br>
             ${p.price} ₽
+
             <button class="add" onclick="add(${i})">В корзину</button>
             <button class="desc" onclick="show(${i})">Описание</button>
         </div>`;
@@ -263,7 +257,7 @@ function render(){
     document.getElementById("shop").innerHTML=html;
 }
 
-/* CART UPDATE */
+/* CART */
 function update(){
     let html="";
     let sum=0;
@@ -295,6 +289,15 @@ function update(){
     document.getElementById("items").innerHTML=html;
     document.getElementById("total").innerText="Итого: "+sum+" ₽";
     document.getElementById("count").innerText=count;
+}
+
+/* ORDER */
+function order(){
+    if(cart.length===0){
+        alert("Корзина пуста");
+        return;
+    }
+    alert("Заказ оформлен (заглушка)");
 }
 
 /* DESCRIPTION */
