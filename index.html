@@ -7,64 +7,70 @@
 
 <style>
 body {
-    margin: 0;
+    margin:0;
     font-family: Arial;
-    background: #f6f7fb;
+    background:#f6f7fb;
 }
 
 header {
     position: sticky;
-    top: 0;
-    background: white;
-    padding: 16px;
-    font-weight: 700;
-    border-bottom: 1px solid #eee;
+    top:0;
+    background:white;
+    padding:16px;
+    font-weight:700;
+    border-bottom:1px solid #eee;
 }
 
 .container {
-    padding: 15px;
-    display: grid;
+    padding:15px;
+    display:grid;
     grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
-    gap: 12px;
+    gap:12px;
 }
 
 .card {
-    background: white;
-    padding: 14px;
-    border-radius: 14px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    background:white;
+    padding:14px;
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
 }
 
 button {
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    width:100%;
+    margin-top:6px;
+    padding:8px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
 }
 
-/* CART BTN */
-#cartBtn {
-    position: fixed;
-    right: 15px;
-    top: 15px;
-    background: black;
-    color: white;
-    padding: 10px 12px;
-    border-radius: 12px;
-}
+.add { background:green; color:white; }
+.desc { background:#4da6ff; color:white; }
 
 /* CART */
-#cart {
-    position: fixed;
-    right: -380px;
-    top: 0;
-    width: 340px;
-    height: 100%;
-    background: white;
-    transition: 0.3s;
-    padding: 15px;
+#cartBtn {
+    position:fixed;
+    right:15px;
+    top:15px;
+    background:black;
+    color:white;
+    padding:10px 12px;
+    border-radius:12px;
 }
 
-#cart.open { right: 0; }
+#cart {
+    position:fixed;
+    right:-380px;
+    top:0;
+    width:340px;
+    height:100%;
+    background:white;
+    padding:15px;
+    transition:0.3s;
+    overflow:auto;
+}
+
+#cart.open { right:0; }
 
 .item {
     display:flex;
@@ -72,43 +78,59 @@ button {
     align-items:center;
     padding:10px 0;
     border-bottom:1px solid #eee;
-    font-size: 14px;
+    font-size:14px;
 }
 
-/* qty controls */
 .qty {
     display:flex;
-    align-items:center;
     gap:5px;
+    align-items:center;
 }
 
 .qty button {
-    width: 22px;
-    height: 22px;
-    font-size: 14px;
+    width:22px;
+    height:22px;
+    font-size:14px;
     background:#eee;
 }
 
 .del {
-    width: 22px;
-    height: 22px;
-    font-size: 12px;
+    width:22px;
+    height:22px;
     background:red;
     color:white;
+    font-size:12px;
 }
 
 /* overlay */
 #overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-    opacity: 0;
-    visibility: hidden;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.35);
+    opacity:0;
+    visibility:hidden;
 }
 
 #overlay.show {
-    opacity: 1;
-    visibility: visible;
+    opacity:1;
+    visibility:visible;
+}
+
+/* popup */
+#popup {
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,0.5);
+}
+
+.popupBox {
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    width:280px;
 }
 </style>
 </head>
@@ -122,22 +144,32 @@ button {
 
 <div class="container" id="shop"></div>
 
+<!-- CART -->
 <div id="cart">
     <h3>Корзина</h3>
     <div id="items"></div>
-    <p id="total"></p>
+    <p id="total">Итого: 0 ₽</p>
+</div>
+
+<!-- POPUP -->
+<div id="popup">
+    <div class="popupBox">
+        <h3 id="pname"></h3>
+        <p id="pdesc"></p>
+        <p id="psize"></p>
+        <button onclick="closePopup()">Закрыть</button>
+    </div>
 </div>
 
 <script>
 
-/* PRODUCTS */
+/* PRODUCTS (ВЫПРАВЛЕНО — ВСЕ ЧИСЛА ЧИСЛАМИ) */
 let products = [
-    {name:"Ваза спираль", price:600},
-    {name:"Бюст Сталина", price:1200},
-    {name:"Ваза сердце", price:360}
+    {name:"Ваза спираль", price:600, desc:"Декоративная ваза", size:"140×139×219 мм"},
+    {name:"Бюст Сталина", price:1200, desc:"Классический бюст", size:"176×128×245 мм"},
+    {name:"Ваза сердце", price:360, desc:"Форма сердца", size:"200×70 мм"}
 ];
 
-/* CART WITH QUANTITY */
 let cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
 /* SAVE */
@@ -147,26 +179,19 @@ function save(){
 
 /* ADD */
 function add(i){
-    let found = cart.find(p => p.id === i);
+    let item = cart.find(p => p.id === i);
 
-    if(found){
-        found.qty++;
+    if(item){
+        item.qty += 1;
     } else {
         cart.push({
             id:i,
             name:products[i].name,
-            price:products[i].price,
+            price:Number(products[i].price), // 🔥 FIX NaN
             qty:1
         });
     }
 
-    save();
-    update();
-}
-
-/* REMOVE ITEM */
-function remove(i){
-    cart.splice(i,1);
     save();
     update();
 }
@@ -187,6 +212,12 @@ function minus(i){
     update();
 }
 
+function remove(i){
+    cart.splice(i,1);
+    save();
+    update();
+}
+
 /* RENDER SHOP */
 function render(){
     let html="";
@@ -195,34 +226,37 @@ function render(){
         <div class="card">
             <b>${p.name}</b><br>
             ${p.price} ₽
-            <button onclick="add(${i})" style="background:green;color:white;width:100%;margin-top:6px;padding:8px;">
-                В корзину
-            </button>
+
+            <button class="add" onclick="add(${i})">В корзину</button>
+            <button class="desc" onclick="show(${i})">Описание</button>
         </div>`;
     });
     document.getElementById("shop").innerHTML=html;
 }
 
-/* UPDATE CART */
+/* UPDATE CART (FIX NaN) */
 function update(){
     let html="";
     let sum=0;
     let count=0;
 
     cart.forEach((p,i)=>{
-        sum += p.price * p.qty;
-        count += p.qty;
+        let price = Number(p.price) || 0; // 🔥 FIX
+        let qty = Number(p.qty) || 0;
+
+        sum += price * qty;
+        count += qty;
 
         html+=`
         <div class="item">
             <div>
                 ${p.name}<br>
-                <b>${p.price * p.qty} ₽</b>
+                <b>${price * qty} ₽</b>
             </div>
 
             <div class="qty">
                 <button onclick="minus(${i})">-</button>
-                ${p.qty}
+                ${qty}
                 <button onclick="plus(${i})">+</button>
                 <button class="del" onclick="remove(${i})">×</button>
             </div>
@@ -234,13 +268,24 @@ function update(){
     document.getElementById("count").innerText=count;
 }
 
-/* CART TOGGLE */
+/* CART */
 function toggleCart(){
     document.getElementById("cart").classList.toggle("open");
     document.getElementById("overlay").classList.toggle("show");
 }
 
-/* INIT */
+/* POPUP */
+function show(i){
+    document.getElementById("popup").style.display="flex";
+    document.getElementById("pname").innerText=products[i].name;
+    document.getElementById("pdesc").innerText=products[i].desc;
+    document.getElementById("psize").innerText=products[i].size;
+}
+
+function closePopup(){
+    document.getElementById("popup").style.display="none";
+}
+
 render();
 update();
 
