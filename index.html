@@ -5,62 +5,76 @@
 <title>NEON 3D</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ffffff">
-
 <style>
 body {
     margin: 0;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     background: #f6f7fb;
+    overflow-x: hidden;
 }
 
+/* мягкий фон */
+body::before {
+    content:"";
+    position:fixed;
+    inset:-20%;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(120,160,255,0.10), transparent 40%),
+        radial-gradient(circle at 80% 30%, rgba(180,200,255,0.10), transparent 45%),
+        radial-gradient(circle at 40% 80%, rgba(200,220,255,0.08), transparent 50%);
+    z-index:-1;
+}
+
+/* header */
 header {
     position: sticky;
     top: 0;
-    background: white;
-    padding: 15px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    padding: 16px;
     font-weight: 600;
     border-bottom: 1px solid #eee;
 }
 
+/* grid */
 .container {
-    padding: 15px;
+    padding: 20px;
     display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
 }
 
+/* card */
 .card {
     background: white;
-    padding: 12px;
-    border-radius: 14px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
 
+/* buttons */
 button {
     width: 100%;
-    margin-top: 5px;
-    padding: 8px;
+    margin-top: 6px;
+    padding: 10px;
     border: none;
     border-radius: 10px;
 }
 
-.add { background: green; color: white; }
-.desc { background: #4da6ff; color: white; }
+.addBtn { background: #1faa00; color: white; }
+.descBtn { background: #4da6ff; color: white; }
 
+/* cart */
 #cartBtn {
     position: fixed;
     top: 15px;
     right: 15px;
-    background: black;
+    background: #111;
     color: white;
     padding: 10px;
     border-radius: 12px;
-    z-index: 999;
 }
 
-/* CART */
 #cart {
     position: fixed;
     right: -400px;
@@ -68,9 +82,8 @@ button {
     width: 320px;
     height: 100%;
     background: white;
-    transition: 0.3s;
     padding: 15px;
-    z-index: 1000;
+    transition: 0.3s;
 }
 
 #cart.open {
@@ -94,14 +107,13 @@ button {
 
 <body>
 
-<header>NEON 3D</header>
+<header>NEON 3D PRINT</header>
 
 <div id="cartBtn" onclick="toggleCart()">🛒 <span id="count">0</span></div>
 <div id="overlay" onclick="toggleCart()"></div>
 
 <div class="container" id="shop"></div>
 
-<!-- CART -->
 <div id="cart">
     <h3>Корзина</h3>
     <div id="items"></div>
@@ -122,9 +134,9 @@ button {
 <script>
 
 let products = [
-    {name:"Ваза", price:600, desc:"Ваза", size:"140 мм"},
-    {name:"Сталина бюст", price:1200, desc:"Бюст", size:"245 мм"},
-    {name:"Ваза сердце", price:360, desc:"Сердце", size:"200x70"}
+    {name:"Ваза спираль", price:600, desc:"Ваза", size:"140×139×219 мм"},
+    {name:"Бюст Сталина", price:1200, desc:"Бюст", size:"176×128×245 мм"},
+    {name:"Ваза сердце", price:360, desc:"Сердце", size:"200×70 мм"}
 ];
 
 let cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -140,8 +152,8 @@ function render(){
         <div class="card">
             <b>${p.name}</b><br>
             ${p.price} ₽
-            <button class="add" onclick="add(${i})">В корзину</button>
-            <button class="desc" onclick="show(${i})">Описание</button>
+            <button class="addBtn" onclick="add(${i})">В корзину</button>
+            <button class="descBtn" onclick="show(${i})">Описание</button>
         </div>`;
     });
     document.getElementById("shop").innerHTML=html;
@@ -188,11 +200,6 @@ function show(i){
 
 function closePopup(){
     document.getElementById("popup").style.display="none";
-}
-
-/* PWA FIX */
-if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("sw.js");
 }
 
 render();
