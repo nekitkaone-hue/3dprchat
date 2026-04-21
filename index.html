@@ -52,16 +52,14 @@ button {
 }
 
 /* ADMIN */
-#adminPanel {
-    display: none;
+#admin {
     position: fixed;
-    top: 0;
     right: 0;
+    top: 0;
     width: 300px;
     height: 100%;
     background: #111;
     padding: 15px;
-    overflow-y: auto;
     border-left: 2px solid #00f0ff;
 }
 
@@ -70,11 +68,6 @@ input {
     padding: 8px;
     margin: 5px 0;
 }
-
-.small {
-    font-size: 12px;
-    color: gray;
-}
 </style>
 </head>
 
@@ -82,101 +75,81 @@ input {
 
 <header>
     <h2>NEON || 3D Печать</h2>
-    <button onclick="openAdmin()">Админ</button>
 </header>
 
-<div class="container" id="products"></div>
+<div class="container" id="shop"></div>
 
 <!-- ADMIN PANEL -->
-<div id="adminPanel">
+<div id="admin">
 
-    <h3>Админ панель</h3>
+<h3>Админка</h3>
 
-    <div id="loginBox">
-        <input type="password" id="pass" placeholder="Пароль">
-        <button onclick="login()">Войти</button>
-    </div>
+<input id="name" placeholder="Название">
+<input id="price" placeholder="Цена">
+<input id="model" placeholder="3D ссылка (.glb)">
 
-    <div id="panel" style="display:none;">
+<button onclick="addProduct()">Добавить товар</button>
 
-        <input id="name" placeholder="Название">
-        <input id="price" placeholder="Цена">
-        <input id="model" placeholder="3D модель (.glb ссылка)">
+<hr>
 
-        <button onclick="add()">Добавить товар</button>
+<div id="list"></div>
 
-        <hr>
-
-        <div id="list"></div>
-    </div>
 </div>
 
 <script>
 
-const PASSWORD = "neon123"; // 🔑 пароль админки
-const tgUser = "YOUR_USERNAME"; // Telegram
+const tgUser = "YOUR_USERNAME";
 
-function openAdmin(){
-    document.getElementById("adminPanel").style.display = "block";
-}
-
-function login(){
-    if(document.getElementById("pass").value === PASSWORD){
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("panel").style.display = "block";
-        render();
-    } else {
-        alert("Неверный пароль");
-    }
-}
-
-/* PRODUCTS */
-function get(){
+function getProducts(){
     return JSON.parse(localStorage.getItem("products") || "[]");
 }
 
-function save(data){
+function saveProducts(data){
     localStorage.setItem("products", JSON.stringify(data));
     render();
-    loadProducts();
+    renderShop();
 }
 
-function add(){
-    let data = get();
+function addProduct(){
+    let data = getProducts();
 
-    data.push({
-        name: name.value,
-        price: price.value,
-        model: model.value
-    });
+    let name = document.getElementById("name").value;
+    let price = document.getElementById("price").value;
+    let model = document.getElementById("model").value;
 
-    save(data);
+    if(!name  !price  !model){
+        alert("Заполни все поля!");
+        return;
+    }
+
+    data.push({name, price, model});
+
+    saveProducts(data);
 }
 
-function del(i){
-    let data = get();
+function deleteProduct(i){
+    let data = getProducts();
     data.splice(i,1);
-    save(data);
+    saveProducts(data);
 }
 
 function render(){
-    let data = get();
+    let data = getProducts();
     let html = "";
 
     data.forEach((p,i)=>{
         html += `
         <div>
-            <b>${p.name}</b> - €${p.price}
-            <button onclick="del(${i})">Удалить</button>
+            ${p.name} - €${p.price}
+            <button onclick="deleteProduct(${i})">X</button>
         </div>`;
     });
 
     document.getElementById("list").innerHTML = html;
 }
 
-/* SHOP */
-function loadProducts(){
-    let data = get();
+function renderShop(){
+    let data = getProducts();
     let html = "";
 
     data.forEach(p=>{
@@ -185,18 +158,17 @@ function loadProducts(){
             <model-viewer src="${p.model}" auto-rotate camera-controls></model-viewer>
             <h3>${p.name}</h3>
             <p>€${p.price}</p>
-            <button onclick="order('${p.name}')">Заказать</button>
+            <button onclick="window.open('https://t.me/${tgUser}?text=Хочу заказать: ${p.name}')">
+            Заказать
+            </button>
         </div>`;
     });
 
-    document.getElementById("products").innerHTML = html;
+    document.getElementById("shop").innerHTML = html;
 }
 
-function order(name){
-    window.open("https://t.me/" + tgUser + "?text=Хочу заказать: " + name);
-}
-
-loadProducts();
+render();
+renderShop();
 
 </script>
 
