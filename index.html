@@ -169,8 +169,8 @@ function render(){
     products.forEach((p,i)=>{
 
         let media = p.model
-        ? <model-viewer src="${p.model}" auto-rotate camera-controls></model-viewer>
-        : <div class="placeholder">📦 Нет 3D модели</div>;
+        ? `<model-viewer src="${p.model}" auto-rotate camera-controls></model-viewer>`
+        : `<div class="placeholder">📦 Нет 3D модели</div>`;
 
         html += `
         <div class="card">
@@ -201,7 +201,7 @@ function update(){
 
     cart.forEach(p=>{
         sum += p.price;
-        html += <div class="cart-item">${p.name} — ${p.price} ₽</div>;
+        html += `<div class="cart-item">${p.name} — ${p.price} ₽</div>`;
     });
 
     document.getElementById("items").innerHTML = html;
