@@ -15,6 +15,20 @@ body {
     color: #111;
 }
 
+/* INFO */
+#info {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.85);
+    color: white;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    z-index: 999;
+    line-height: 1.4;
+}
+
 /* HEADER */
 header {
     padding: 25px;
@@ -47,7 +61,6 @@ header {
     transform: translateY(-5px);
 }
 
-/* 3D VIEW */
 model-viewer {
     width: 100%;
     height: 220px;
@@ -55,7 +68,6 @@ model-viewer {
     background: #eee;
 }
 
-/* TEXT */
 h3 {
     margin: 10px 0 5px;
 }
@@ -64,7 +76,6 @@ p {
     color: #666;
 }
 
-/* BUTTON */
 button {
     width: 100%;
     padding: 12px;
@@ -74,7 +85,6 @@ button {
     color: white;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.2s;
 }
 
 button:hover {
@@ -85,11 +95,20 @@ button:hover {
 
 <body>
 
+<!-- INFO -->
+<div id="info">
+    📦 Заказы через:<br>
+    Telegram / WhatsApp / Max
+</div>
+
 <header>NEON || 3D Печать</header>
 
 <div class="container" id="shop"></div>
 
 <script>
+
+/* 🧠 ТВОЙ TELEGRAM */
+const tgUser = "nekitka_one";
 
 /* 🛍 ТОВАРЫ */
 let products = [
@@ -105,9 +124,6 @@ let products = [
     }
 ];
 
-const tgUser = "YOUR_USERNAME";
-
-/* РЕНДЕР МАГАЗИНА */
 function renderShop(){
     let html = "";
 
@@ -124,9 +140,11 @@ function renderShop(){
     document.getElementById("shop").innerHTML = html;
 }
 
-/* ЗАКАЗ */
+/* 📩 ЗАКАЗ В TELEGRAM */
 function order(name){
-    window.open("https://t.me/" + tgUser + "?text=Хочу заказать: " + name);
+    window.open(
+        "https://t.me/" + tgUser + "?text=Хочу заказать: " + name
+    );
 }
 
 renderShop();
