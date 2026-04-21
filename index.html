@@ -8,8 +8,6 @@
 <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 <style>
-
-/* ===== BASE ===== */
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial;
@@ -17,7 +15,7 @@ body {
     color: #111;
 }
 
-/* ===== TOP BAR ===== */
+/* HEADER */
 header {
     position: sticky;
     top: 0;
@@ -29,17 +27,29 @@ header {
     border-bottom: 1px solid #eee;
 }
 
-/* ===== LAYOUT ===== */
+/* CART BUTTON */
+#cartBtn {
+    position: fixed;
+    right: 20px;
+    top: 15px;
+    background: #111;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+/* GRID */
 .container {
     max-width: 1100px;
     margin: auto;
     padding: 30px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 20px;
 }
 
-/* ===== CARD (как у premium cart UI) ===== */
+/* CARD */
 .card {
     background: white;
     border-radius: 16px;
@@ -50,7 +60,6 @@ header {
 
 .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
 model-viewer {
@@ -59,7 +68,18 @@ model-viewer {
     background: #fafafa;
 }
 
-/* ===== TEXT ===== */
+/* PLACEHOLDER */
+.placeholder {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* TEXT */
 .content {
     padding: 15px;
 }
@@ -74,7 +94,7 @@ model-viewer {
     color: #666;
 }
 
-/* ===== BUTTON (clean metta style) ===== */
+/* BUTTON */
 button {
     margin-top: 10px;
     width: 100%;
@@ -87,23 +107,7 @@ button {
     cursor: pointer;
 }
 
-button:hover {
-    background: #333;
-}
-
-/* ===== CART BUTTON ===== */
-#cartBtn {
-    position: fixed;
-    right: 20px;
-    top: 15px;
-    background: #111;
-    color: white;
-    padding: 10px 14px;
-    border-radius: 12px;
-    cursor: pointer;
-}
-
-/* ===== CART PANEL ===== */
+/* CART */
 #cart {
     position: fixed;
     right: 0;
@@ -126,12 +130,6 @@ button:hover {
     margin-top: 20px;
     background: #111;
 }
-
-.small {
-    font-size: 12px;
-    color: #777;
-}
-
 </style>
 </head>
 
@@ -147,7 +145,7 @@ button:hover {
 <div id="cart">
     <h3>Корзина</h3>
     <div id="items"></div>
-    <p id="total">Итого: €0</p>
+    <p id="total">Итого: 0 ₽</p>
     <button id="checkout" onclick="send()">Заказать</button>
 </div>
 
@@ -155,9 +153,11 @@ button:hover {
 
 const tgUser = "nekitka_one";
 
+/* 🛍 ТОВАРЫ */
 let products = [
-    {name:"3D Меч", price:15, model:"https://model.glb"},
-    {name:"Дракон", price:25, model:"https://model.glb"}
+    {name:"3D Меч", price:1500, model:"https://model.glb"},
+    {name:"Дракон", price:2500, model:"https://model.glb"},
+    {name:"Ваза", price:600, model:""} // без фото
 ];
 
 let cart = [];
@@ -167,12 +167,17 @@ function render(){
     let html = "";
 
     products.forEach((p,i)=>{
+
+        let media = p.model
+        ? <model-viewer src="${p.model}" auto-rotate camera-controls></model-viewer>
+        : <div class="placeholder">📦 Нет 3D модели</div>;
+
         html += `
         <div class="card">
-            <model-viewer src="${p.model}" auto-rotate camera-controls></model-viewer>
+            ${media}
             <div class="content">
                 <div class="title">${p.name}</div>
-                <div class="price">€${p.price}</div>
+                <div class="price">${p.price} ₽</div>
                 <button onclick="add(${i})">В корзину</button>
             </div>
         </div>`;
@@ -181,28 +186,29 @@ function render(){
     document.getElementById("shop").innerHTML = html;
 }
 
-/* CART */
+/* ADD TO CART */
 function add(i){
     cart.push(products[i]);
     update();
 }
 
+/* UPDATE CART */
 function update(){
     document.getElementById("count").innerText = cart.length;
 
     let html = "";
     let sum = 0;
 
-    cart.forEach((p,i)=>{
+    cart.forEach(p=>{
         sum += p.price;
-        html += <div class="cart-item">${p.name} - €${p.price}</div>;
+        html += <div class="cart-item">${p.name} — ${p.price} ₽</div>;
     });
 
     document.getElementById("items").innerHTML = html;
-    document.getElementById("total").innerText = "Итого: €" + sum;
+    document.getElementById("total").innerText = "Итого: " + sum + " ₽";
 }
 
-/* CART TOGGLE */
+/* TOGGLE CART */
 function toggleCart(){
     let c = document.getElementById("cart");
     c.style.display = c.style.display === "block" ? "none" : "block";
@@ -214,13 +220,13 @@ function send(){
     let sum = 0;
 
     cart.forEach(p=>{
-        text += "- " + p.name + " (€" + p.price + ")%0A";
+        text += "- " + p.name + " (" + p.price + "₽)%0A";
         sum += p.price;
     });
 
-    text += "%0AИтого: €" + sum;
+    text += "%0AИтого: " + sum + "₽";
 
-    window.open("https://t.me/" + tgUser + "?text=" + text);
+    window.open("https://t.me/" + tgUser + "?text=" + text, "_blank");
 }
 
 render();
