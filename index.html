@@ -35,6 +35,7 @@ header{
     box-shadow:0 6px 18px rgba(0,0,0,0.08);
 }
 
+/* buttons */
 button{
     width:100%;
     margin-top:6px;
@@ -79,39 +80,37 @@ button{
     align-items:center;
     padding:10px 0;
     border-bottom:1px solid #eee;
+    font-size:14px;
 }
 
-/* qty */
+/* qty block */
 .qty{
     display:flex;
     align-items:center;
-    gap:6px;
+    gap:5px;
 }
 
 .qty button{
     width:26px;
     height:26px;
-    font-size:16px;
-    background:#eee;
     display:flex;
     align-items:center;
     justify-content:center;
+    font-size:16px;
+    background:#eee;
 }
 
-/* 🔴 DELETE BUTTON FIX */
+/* 🔴 FIXED DELETE BUTTON (now visible) */
 .del{
-    width:24px;
-    height:24px;
-    font-size:12px;
-    background:#ff3b30; /* ярко-красный */
+    width:26px;
+    height:26px;
+    background:#ff3b30 !important;
     color:white;
-}
-
-/* CLEAR CART BUTTON */
-.clear{
-    background:#ff3b30;
-    color:white;
-    margin-top:10px;
+    font-size:14px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 /* overlay */
@@ -126,6 +125,23 @@ button{
 #overlay.show{
     opacity:1;
     visibility:visible;
+}
+
+/* POPUP DESCRIPTION FIXED */
+#popup{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,0.5);
+}
+
+.popupBox{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    width:280px;
 }
 </style>
 </head>
@@ -145,18 +161,28 @@ button{
     <div id="items"></div>
     <p id="total">Итого: 0 ₽</p>
 
-    <!-- 🔴 CLEAR RESTORED -->
-    <button class="clear" onclick="clearCart()">Очистить корзину</button>
+    <button onclick="clearCart()" style="background:#ff3b30;color:white;">
+        Очистить корзину
+    </button>
+</div>
 
-    <button style="background:#111;color:white;margin-top:8px;" onclick="pay()">Оформить заказ</button>
+<!-- DESCRIPTION POPUP -->
+<div id="popup">
+    <div class="popupBox">
+        <h3 id="pname"></h3>
+        <p id="pdesc"></p>
+        <p id="psize"></p>
+        <button onclick="closePopup()">Закрыть</button>
+    </div>
 </div>
 
 <script>
 
+/* PRODUCTS */
 let products=[
-    {name:"Ваза спираль",price:600,desc:"Ваза",size:"140×139×219 мм"},
-    {name:"Бюст Сталина",price:1200,desc:"Бюст",size:"176×128×245 mm"},
-    {name:"Ваза сердце",price:360,desc:"Сердце",size:"200×70 mm"}
+    {name:"Ваза спираль",price:600,desc:"Декоративная ваза",size:"140×139×219 мм"},
+    {name:"Бюст Сталина",price:1200,desc:"Классический бюст",size:"176×128×245 мм"},
+    {name:"Ваза сердце",price:360,desc:"Форма сердца",size:"200×70 мм"}
 ];
 
 let cart=JSON.parse(localStorage.getItem("cart")||"[]");
@@ -165,6 +191,7 @@ function save(){
     localStorage.setItem("cart",JSON.stringify(cart));
 }
 
+/* ADD */
 function add(i){
     let f=cart.find(p=>p.id===i);
 
@@ -183,6 +210,7 @@ function add(i){
     update();
 }
 
+/* PLUS MINUS */
 function plus(i){
     cart[i].qty++;
     save();
@@ -196,20 +224,21 @@ function minus(i){
     update();
 }
 
-/* 🔴 DELETE ITEM */
+/* DELETE */
 function remove(i){
     cart.splice(i,1);
     save();
     update();
 }
 
-/* 🔴 CLEAR CART */
+/* CLEAR */
 function clearCart(){
     cart=[];
     save();
     update();
 }
 
+/* SHOP */
 function render(){
     let html="";
     products.forEach((p,i)=>{
@@ -217,14 +246,15 @@ function render(){
         <div class="card">
             <b>${p.name}</b><br>
             ${p.price} ₽
+
             <button class="add" onclick="add(${i})">В корзину</button>
-            <button class="desc" onclick="alert('${p.desc}\\n${p.size}')">Описание</button>
+            <button class="desc" onclick="show(${i})">Описание</button>
         </div>`;
     });
     document.getElementById("shop").innerHTML=html;
 }
 
-/* UPDATE */
+/* CART UPDATE FIXED */
 function update(){
     let html="";
     let sum=0;
@@ -258,13 +288,22 @@ function update(){
     document.getElementById("count").innerText=count;
 }
 
+/* DESCRIPTION FIXED (popup) */
+function show(i){
+    document.getElementById("popup").style.display="flex";
+    document.getElementById("pname").innerText=products[i].name;
+    document.getElementById("pdesc").innerText=products[i].desc;
+    document.getElementById("psize").innerText=products[i].size;
+}
+
+function closePopup(){
+    document.getElementById("popup").style.display="none";
+}
+
+/* CART */
 function toggleCart(){
     document.getElementById("cart").classList.toggle("open");
     document.getElementById("overlay").classList.toggle("show");
-}
-
-function pay(){
-    alert("Заказ оформлен (заглушка)");
 }
 
 render();
