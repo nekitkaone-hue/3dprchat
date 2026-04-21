@@ -1,4 +1,3 @@
-<h1 style="color:red">TEST NEON UPDATE</h1>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -18,8 +17,10 @@ body {
 
 header {
     padding: 20px;
-    display: flex;
-    justify-content: space-between;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #00f0ff;
 }
 
 .container {
@@ -50,108 +51,54 @@ button {
     border: none;
     cursor: pointer;
     font-weight: bold;
-
-
-input {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-    <h2>NEON || 3D Печать</h2>
-</header>
+<header>NEON || 3D Печать</header>
 
 <div class="container" id="shop"></div>
 
-<input id="name" placeholder="Название">
-<input id="price" placeholder="Цена">
-<input id="model" placeholder="3D ссылка (.glb)">
-
-<button onclick="addProduct()">Добавить товар</button>
-
-<hr>
-
-<div id="list"></div>
-
-</div>
-
 <script>
+
+/* 👉 ТУТ БУДУТ ТВОИ ТОВАРЫ */
+let products = [
+    {
+        name: "3D Модель Меча",
+        price: "15",
+        model: "https://model.glb"
+    },
+    {
+        name: "Фигурка Дракона",
+        price: "25",
+        model: "https://model.glb"
+    }
+];
 
 const tgUser = "nekitka_one";
 
-function getProducts(){
-    return JSON.parse(localStorage.getItem("products") || "[]");
-}
-
-function saveProducts(data){
-    localStorage.setItem("products", JSON.stringify(data));
-    render();
-    renderShop();
-}
-
-function addProduct(){
-    let data = getProducts();
-
-    let name = document.getElementById("name").value;
-    let price = document.getElementById("price").value;
-    let model = document.getElementById("model").value;
-
-    if(!name  !price  !model){
-        alert("Заполни все поля!");
-        return;
-    }
-
-    data.push({name, price, model});
-
-    saveProducts(data);
-}
-
-function deleteProduct(i){
-    let data = getProducts();
-    data.splice(i,1);
-    saveProducts(data);
-}
-
-function render(){
-    let data = getProducts();
-    let html = "";
-
-    data.forEach((p,i)=>{
-        html += `
-        <div>
-            ${p.name} - €${p.price}
-            <button onclick="deleteProduct(${i})">X</button>
-        </div>`;
-    });
-
-    document.getElementById("list").innerHTML = html;
-}
-
 function renderShop(){
-    let data = getProducts();
     let html = "";
 
-    data.forEach(p=>{
+    products.forEach(p=>{
         html += `
         <div class="card">
             <model-viewer src="${p.model}" auto-rotate camera-controls></model-viewer>
             <h3>${p.name}</h3>
             <p>€${p.price}</p>
-            <button onclick="window.open('https://t.me/${tgUser}?text=Хочу заказать: ${p.name}')">
-            Заказать
-            </button>
+            <button onclick="order('${p.name}')">Заказать</button>
         </div>`;
     });
 
     document.getElementById("shop").innerHTML = html;
 }
 
-render();
+function order(name){
+    window.open("https://t.me/" + tgUser + "?text=Хочу заказать: " + name);
+}
+
 renderShop();
 
 </script>
