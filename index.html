@@ -12,6 +12,7 @@ body{
     background:#f6f7fb;
 }
 
+/* HEADER */
 header{
     position:sticky;
     top:0;
@@ -22,6 +23,7 @@ header{
     cursor:pointer;
 }
 
+/* SHOP */
 .container{
     padding:15px;
     display:grid;
@@ -73,6 +75,24 @@ button{
 
 #cart.open{right:0;}
 
+/* CART HEADER ROW */
+.cartTop{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+/* CLEAR BUTTON (TOP RIGHT) */
+.clearTop{
+    background:#ff3b30;
+    color:white;
+    width:auto;
+    padding:6px 10px;
+    font-size:12px;
+}
+
+/* ITEMS */
 .item{
     display:flex;
     justify-content:space-between;
@@ -87,30 +107,32 @@ button{
     gap:5px;
 }
 
+/* 🔥 + / - GREEN */
 .qty button{
     width:26px;
     height:26px;
-    background:#eee;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#2ecc71; /* GREEN */
+    color:white;
+    font-weight:bold;
 }
 
+/* 🔴 DELETE */
 .del{
     width:26px;
     height:26px;
     background:#ff3b30;
     color:white;
+    font-weight:bold;
 }
 
-/* BUTTONS */
-.clear{
-    background:#ff3b30;
-    color:white;
-    margin-top:10px;
-}
-
+/* ORDER */
 .order{
     background:#111;
     color:white;
-    margin-top:8px;
+    margin-top:10px;
 }
 
 /* overlay */
@@ -148,9 +170,7 @@ button{
 
 <body>
 
-<header onclick="location.reload()">
-NEON || 3D Печать
-</header>
+<header onclick="location.reload()">NEON || 3D Печать</header>
 
 <div id="cartBtn" onclick="toggleCart()">🛒 <span id="count">0</span></div>
 <div id="overlay" onclick="toggleCart()"></div>
@@ -159,11 +179,17 @@ NEON || 3D Печать
 
 <!-- CART -->
 <div id="cart">
-    <h3>Корзина</h3>
+
+    <div class="cartTop">
+        <h3 style="margin:0;">Корзина</h3>
+
+        <!-- 🔥 MOVED CLEAR BUTTON -->
+        <button class="clearTop" onclick="clearCart()">Очистить</button>
+    </div>
+
     <div id="items"></div>
     <p id="total">Итого: 0 ₽</p>
 
-    <button class="clear" onclick="clearCart()">Очистить корзину</button>
     <button class="order" onclick="order()">Оформить заказ</button>
 </div>
 
@@ -186,6 +212,14 @@ let products=[
 ];
 
 let cart=JSON.parse(localStorage.getItem("cart")||"[]");
+
+/* FIX DATA */
+cart = (cart||[]).map(p=>({
+    id:p.id??0,
+    name:p.name??"Товар",
+    price:Number(p.price)||0,
+    qty:Number(p.qty)||1
+}));
 
 function save(){
     localStorage.setItem("cart",JSON.stringify(cart));
@@ -286,7 +320,7 @@ function update(){
     document.getElementById("count").innerText=count;
 }
 
-/* TELEGRAM ORDER (как ты просил) */
+/* ORDER */
 function order(){
     if(cart.length===0){
         alert("Корзина пуста");
@@ -297,15 +331,18 @@ function order(){
     let sum=0;
 
     cart.forEach(p=>{
-        text+=`${p.name} x${p.qty} = ${p.price*p.qty} ₽%0A`;
-        sum+=p.price*p.qty;
+        let price=Number(p.price)||0;
+        let qty=Number(p.qty)||1;
+
+        let total=price*qty;
+
+        text+=`${p.name} x${qty} = ${total} ₽%0A`;
+        sum+=total;
     });
 
     text+=`%0A💰 ИТОГО: ${sum} ₽`;
 
-    let username="nekitka_one";
-
-    window.open(`https://t.me/${username}?text=${text}`,"_blank");
+    window.open(`https://t.me/nekitka_one?text=${text}`,"_blank");
 }
 
 /* DESCRIPTION */
@@ -320,7 +357,7 @@ function closePopup(){
     document.getElementById("popup").style.display="none";
 }
 
-/* CART */
+/* CART TOGGLE */
 function toggleCart(){
     document.getElementById("cart").classList.toggle("open");
     document.getElementById("overlay").classList.toggle("show");
