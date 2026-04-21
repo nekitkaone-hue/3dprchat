@@ -13,13 +13,6 @@ body {
     color: #111;
 }
 
-/* 📱 МОБИЛЬНЫЙ ФОН */
-@media (max-width: 768px) {
-    body {
-        background: linear-gradient(135deg, #e8f0ff, #f7f7f7);
-    }
-}
-
 /* HEADER */
 header {
     position: sticky;
@@ -61,6 +54,11 @@ header {
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
 }
 
 .card img {
@@ -90,19 +88,10 @@ button {
     padding: 12px;
     border-radius: 10px;
     border: none;
+    background: #111;
     color: white;
     font-weight: 500;
     cursor: pointer;
-}
-
-/* 🟢 ЗАКАЗ */
-#checkout {
-    background: #1faa00;
-}
-
-/* 🔴 ОЧИСТКА */
-#clearCart {
-    background: #ff1e1e;
 }
 
 /* CART */
@@ -163,6 +152,19 @@ button {
     font-size:12px;
     width:auto;
 }
+
+/* BUTTONS */
+#checkout {
+    background: #1faa00;
+    color: white;
+    margin-top: 10px;
+}
+
+#clearCart {
+    background: #ff1e1e;
+    color: white;
+    margin-top: 10px;
+}
 </style>
 </head>
 
@@ -192,17 +194,17 @@ button {
 
 const tgUser = "nekitka_one";
 
-/* 🛍 ТОВАРЫ */
+/* 🛍 ТОВАРЫ (ИСПРАВЛЕНО ФОТО) */
 let products = [
     {
         name: "Ваза спиралевидная",
         price: 600,
-        img: "https://via.placeholder.com/400x300?text=Vase"
+        img: "https://images.unsplash.com/photo-1588854337221-4cf9fa96059c?auto=format&fit=crop&w=800&q=80"
     },
     {
         name: "Бюст Сталина",
         price: 1200,
-        img: "https://via.placeholder.com/400x300?text=White+Marble+Bust"
+        img: "https://images.unsplash.com/photo-1618331835717-801e976710b2?auto=format&fit=crop&w=800&q=80"
     }
 ];
 
@@ -219,7 +221,7 @@ function render(){
     products.forEach((p,i)=>{
         html += `
         <div class="card">
-            <img src="${p.img}">
+            <img src="${p.img}" alt="product">
 
             <div class="content">
                 <div class="title">${p.name}</div>
