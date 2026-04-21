@@ -6,23 +6,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* 🌫️ ОСНОВНОЙ ФОН */
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial;
-    background: #f6f6f6;
     color: #111;
+    background: #f6f7fb;
+    overflow-x: hidden;
+}
+
+/* мягкий анимированный фон */
+body::before {
+    content: "";
+    position: fixed;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(120,160,255,0.10), transparent 40%),
+        radial-gradient(circle at 80% 30%, rgba(180,200,255,0.10), transparent 45%),
+        radial-gradient(circle at 40% 80%, rgba(200,220,255,0.08), transparent 50%);
+    animation: floatBg 18s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes floatBg {
+    0% { transform: translate(0px, 0px) scale(1); }
+    50% { transform: translate(-10px, 10px) scale(1.02); }
+    100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@media (max-width: 768px) {
+    body::before {
+        opacity: 0.6;
+        animation: none;
+    }
 }
 
 /* HEADER */
 header {
     position: sticky;
     top: 0;
-    background: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.85);
     backdrop-filter: blur(10px);
     padding: 18px 30px;
     font-size: 20px;
     font-weight: 600;
     border-bottom: 1px solid #eee;
+    z-index: 10;
 }
 
 /* CART BTN */
@@ -41,23 +73,20 @@ header {
 /* OVERLAY */
 #overlay {
     position: fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
+    inset: 0;
     background: rgba(0,0,0,0.35);
-    opacity:0;
-    visibility:hidden;
-    transition:0.25s;
-    z-index:998;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.25s;
+    z-index: 998;
 }
 
 #overlay.show {
-    opacity:1;
-    visibility:visible;
+    opacity: 1;
+    visibility: visible;
 }
 
-/* GRID */
+/* SHOP GRID */
 .container {
     max-width: 1100px;
     margin: auto;
@@ -79,7 +108,6 @@ header {
 
 .card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 14px 35px rgba(0,0,0,0.12);
 }
 
 .title {
@@ -101,7 +129,6 @@ header {
     border: none;
     background: #1faa00;
     color: white;
-    font-weight: 500;
     cursor: pointer;
 }
 
@@ -113,7 +140,6 @@ header {
     border: none;
     background: #4da6ff;
     color: white;
-    font-weight: 500;
     cursor: pointer;
 }
 
@@ -153,23 +179,20 @@ header {
 /* POPUP */
 #popup {
     position: fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
+    inset: 0;
     background: rgba(0,0,0,0.5);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
 }
 
 .popupBox {
-    background:white;
-    padding:20px;
-    border-radius:14px;
-    width:300px;
-    text-align:center;
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    width: 300px;
+    text-align: center;
 }
 </style>
 </head>
@@ -233,7 +256,6 @@ let products = [
 
 let cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-/* SAVE */
 function saveCart(){
     localStorage.setItem("cart", JSON.stringify(cart));
 }
@@ -294,7 +316,7 @@ function update(){
     let sum = 0;
 
     cart.forEach((p,i)=>{
-        let price = typeof p.price === "string" ? 1200 : p.price;
+        let price = p.price;
         sum += price;
 
         html += `
@@ -320,9 +342,8 @@ function send(){
     let sum = 0;
 
     cart.forEach(p=>{
-        let price = typeof p.price === "string" ? 1200 : p.price;
-        text += "- " + p.name + " (" + price + "₽)%0A";
-        sum += price;
+        text += "- " + p.name + " (" + p.price + "₽)%0A";
+        sum += p.price;
     });
 
     text += "%0AИтого: " + sum + "₽";
@@ -330,7 +351,7 @@ function send(){
     window.open("https://t.me/" + tgUser + "?text=" + text, "_blank");
 }
 
-/* SWIPE CLOSE (mobile) */
+/* SWIPE */
 let startX = 0;
 
 document.addEventListener("touchstart", e=>{
