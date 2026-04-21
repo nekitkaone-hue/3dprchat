@@ -12,6 +12,7 @@ body{
     background:#f6f7fb;
 }
 
+/* HEADER */
 header{
     position:sticky;
     top:0;
@@ -60,6 +61,7 @@ button{
     border-radius:12px;
 }
 
+/* CART PANEL */
 #cart{
     position:fixed;
     right:-380px;
@@ -74,7 +76,7 @@ button{
 
 #cart.open{right:0;}
 
-/* CART TOP */
+/* TOP BAR */
 .cartTop{
     display:flex;
     justify-content:space-between;
@@ -82,12 +84,12 @@ button{
     margin-bottom:10px;
 }
 
-.clearTop{
-    background:#ff3b30;
-    color:white;
+/* ❌ CLOSE BUTTON */
+.closeCart{
     width:auto;
-    padding:6px 10px;
-    font-size:12px;
+    background:#eee;
+    font-size:18px;
+    padding:4px 10px;
 }
 
 /* ITEMS */
@@ -106,7 +108,6 @@ button{
     gap:5px;
 }
 
-/* GREEN + / - */
 .qty button{
     width:26px;
     height:26px;
@@ -120,6 +121,13 @@ button{
     background:#111;
     color:white;
     margin-top:10px;
+}
+
+/* CLEAR BOTTOM */
+.clearBottom{
+    background:#ff3b30;
+    color:white;
+    margin-top:8px;
 }
 
 /* overlay */
@@ -169,13 +177,18 @@ button{
 
     <div class="cartTop">
         <h3 style="margin:0;">Корзина</h3>
-        <button class="clearTop" onclick="clearCart()">Очистить</button>
+
+        <!-- ❌ CLOSE BUTTON -->
+        <button class="closeCart" onclick="toggleCart()">✕</button>
     </div>
 
     <div id="items"></div>
     <p id="total">Итого: 0 ₽</p>
 
     <button class="order" onclick="order()">Оформить заказ</button>
+
+    <!-- 🔴 CLEAR MOVED TO BOTTOM -->
+    <button class="clearBottom" onclick="clearCart()">Очистить корзину</button>
 </div>
 
 <!-- POPUP -->
@@ -190,24 +203,23 @@ button{
 
 <script>
 
-/* PRODUCTS WITH YOUR DESCRIPTIONS */
 let products=[
     {
         name:"Ваза спиралевидная",
         price:600,
-        desc:"Элегантная декоративная ваза с плавной спиральной формой, создающая эффект движения и игры света. Идеально подходит для современного интерьера и сухоцветов.",
+        desc:"Элегантная декоративная ваза с плавной спиральной формой.",
         size:"140×139×219 мм"
     },
     {
         name:"Бюст Сталина",
         price:1200,
-        desc:"Декоративный бюст в классическом стиле, отражающий монументальную эстетику. Подходит для интерьера, коллекций и тематических пространств.",
+        desc:"Декоративный бюст в классическом стиле.",
         size:"176×128×245 мм"
     },
     {
         name:"Ваза сердце в руках",
         price:360,
-        desc:"Художественная ваза в виде рук, бережно удерживающих сердце. Символ заботы и тепла, идеально подходит для интерьерного декора.",
+        desc:"Художественная ваза в виде рук, держащих сердце.",
         size:"200×70 мм"
     }
 ];
