@@ -63,10 +63,12 @@ header {
     transform: translateY(-4px);
 }
 
-model-viewer {
-    width: 100%;
+.placeholder {
     height: 220px;
-    background: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
 }
 
 /* TEXT */
@@ -97,19 +99,7 @@ button {
     cursor: pointer;
 }
 
-/* 🔳 OVERLAY */
-#overlay {
-    position: fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background: rgba(0,0,0,0.4);
-    display: none;
-    z-index: 998;
-}
-
-/* 🛒 CART (анимация как slide) */
+/* CART */
 #cart {
     position: fixed;
     right: -400px;
@@ -123,12 +113,23 @@ button {
     z-index: 999;
 }
 
-/* OPEN STATE */
 #cart.open {
     right: 0;
 }
 
-/* ❌ CLOSE */
+/* OVERLAY */
+#overlay {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    z-index: 998;
+}
+
+/* CLOSE */
 #closeCart {
     position: absolute;
     top: 10px;
@@ -176,17 +177,17 @@ button {
 
 const tgUser = "nekitka_one";
 
-/* 🛍 ТОВАРЫ */
+/* 🛍 ТОЛЬКО ОДИН ТОВАР */
 let products = [
-    {name:"3D Меч", price:1500, model:"https://model.glb"},
-    {name:"Дракон", price:2500, model:"https://model.glb"},
-    {name:"Ваза", price:600, model:""}
+    {
+        name: "Ваза спиралевидная",
+        price: 600,
+        model: ""
+    }
 ];
 
-/* 🧠 LOAD CART */
 let cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-/* SAVE CART */
 function saveCart(){
     localStorage.setItem("cart", JSON.stringify(cart));
 }
@@ -197,15 +198,10 @@ function render(){
 
     products.forEach((p,i)=>{
 
-        let media = p.model
-        ? `<model-viewer src="${p.model}" auto-rotate camera-controls></model-viewer>`
-        : `<div style="height:220px;display:flex;align-items:center;justify-content:center;background:#f0f0f0;">
-            📦 Нет 3D модели
-           </div>`;
-
         html += `
         <div class="card">
-            ${media}
+            <div class="placeholder">📦 Нет фото</div>
+
             <div class="content">
                 <div class="title">${p.name}</div>
                 <div class="price">${p.price} ₽</div>
@@ -240,18 +236,14 @@ function update(){
     document.getElementById("total").innerText = "Итого: " + sum + " ₽";
 }
 
-/* CART TOGGLE */
+/* CART */
 function toggleCart(){
     let cartEl = document.getElementById("cart");
     let overlay = document.getElementById("overlay");
 
     cartEl.classList.toggle("open");
 
-    if(cartEl.classList.contains("open")){
-        overlay.style.display = "block";
-    } else {
-        overlay.style.display = "none";
-    }
+    overlay.style.display = cartEl.classList.contains("open") ? "block" : "none";
 }
 
 /* ORDER */
@@ -269,7 +261,6 @@ function send(){
     window.open("https://t.me/" + tgUser + "?text=" + text, "_blank");
 }
 
-/* INIT */
 render();
 update();
 
