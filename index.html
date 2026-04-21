@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>NEON || 3D Печать</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0a0a0a;
+    color: white;
+}
+
+header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+a {
+    color: #00f0ff;
+    text-decoration: none;
+}
+
+.container {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: #111;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #00f0ff33;
+}
+
+model-viewer {
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+    background: black;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #00f0ff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>NEON || 3D Печать</h2>
+    <a href="admin.html">Админка</a>
+</header>
+
+<div class="container" id="products"></div>
+
+<script>
+const tgUser = "nekitka_one"; // 🔑 поменяй на свой Telegram
+
+function loadProducts() {
+    let data = JSON.parse(localStorage.getItem("products") || "[]");
+    let html = "";
+
+    data.forEach(p => {
+        html += `
+        <div class="card">
+            <model-viewer src="${p.model}" auto-rotate camera-controls></model-viewer>
+            <h3>${p.name}</h3>
+            <p>€${p.price}</p>
+            <button onclick="order('${p.name}')">Заказать</button>
+        </div>`;
+    });
+
+    document.getElementById("products").innerHTML = html;
+}
+
+function order(name) {
+    window.open("https://t.me/" + tgUser + "?text=Хочу заказать: " + name);
+}
+
+loadProducts();
+</script>
+
+</body>
+</html>

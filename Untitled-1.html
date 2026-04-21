@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>NEON Admin</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0a0a0a;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#login, #panel {
+    width: 300px;
+    background: #111;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #00f0ff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.card {
+    background: #222;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+    <h3>Вход в NEON Admin</h3>
+    <input type="password" id="pass" placeholder="Пароль">
+    <button onclick="login()">Войти</button>
+</div>
+
+<!-- PANEL -->
+<div id="panel" style="display:none;">
+    <h3>Админка</h3>
+
+    <input id="name" placeholder="Название">
+    <input id="price" placeholder="Цена">
+    <input id="model" placeholder="3D модель (.glb ссылка)">
+
+    <button onclick="add()">Добавить товар</button>
+
+    <div id="list"></div>
+</div>
+
+<script>
+const PASSWORD = "neon123"; // 🔑 поменяй пароль
+
+function login() {
+    if (document.getElementById("pass").value === PASSWORD) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("panel").style.display = "block";
+        render();
+    } else {
+        alert("Неверный пароль");
+    }
+}
+
+function get() {
+    return JSON.parse(localStorage.getItem("products") || "[]");
+}
+
+function save(data) {
+    localStorage.setItem("products", JSON.stringify(data));
+    render();
+}
+
+function add() {
+    let data = get();
+
+    data.push({
+        name: name.value,
+        price: price.value,
+        model: model.value
+    });
+
+    save(data);
+}
+
+function del(i) {
+    let data = get();
+    data.splice(i, 1);
+    save(data);
+}
+
+function render() {
+    let data = get();
+    let html = "";
+
+    data.forEach((p, i) => {
+        html += `
+        <div class="card">
+            <b>${p.name}</b><br>
+            €${p.price}<br>
+            <button onclick="del(${i})">Удалить</button>
+        </div>`;
+    });
+
+    document.getElementById("list").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
