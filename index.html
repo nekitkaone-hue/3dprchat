@@ -100,14 +100,13 @@ button{
     color:white;
 }
 
-/* CLEAR */
+/* BUTTONS */
 .clear{
     background:#ff3b30;
     color:white;
     margin-top:10px;
 }
 
-/* ORDER BUTTON (RESTORED) */
 .order{
     background:#111;
     color:white;
@@ -149,7 +148,9 @@ button{
 
 <body>
 
-<header onclick="reloadPage()">NEON || 3D Печать</header>
+<header onclick="location.reload()">
+NEON || 3D Печать
+</header>
 
 <div id="cartBtn" onclick="toggleCart()">🛒 <span id="count">0</span></div>
 <div id="overlay" onclick="toggleCart()"></div>
@@ -163,8 +164,6 @@ button{
     <p id="total">Итого: 0 ₽</p>
 
     <button class="clear" onclick="clearCart()">Очистить корзину</button>
-
-    <!-- 🔥 RESTORED ORDER BUTTON -->
     <button class="order" onclick="order()">Оформить заказ</button>
 </div>
 
@@ -179,10 +178,6 @@ button{
 </div>
 
 <script>
-
-function reloadPage(){
-    location.reload();
-}
 
 let products=[
     {name:"Ваза спираль",price:600,desc:"Декоративная ваза",size:"140×139×219 мм"},
@@ -291,13 +286,26 @@ function update(){
     document.getElementById("count").innerText=count;
 }
 
-/* ORDER */
+/* TELEGRAM ORDER (как ты просил) */
 function order(){
     if(cart.length===0){
         alert("Корзина пуста");
         return;
     }
-    alert("Заказ оформлен (заглушка)");
+
+    let text="🛒 Заказ:%0A%0A";
+    let sum=0;
+
+    cart.forEach(p=>{
+        text+=`${p.name} x${p.qty} = ${p.price*p.qty} ₽%0A`;
+        sum+=p.price*p.qty;
+    });
+
+    text+=`%0A💰 ИТОГО: ${sum} ₽`;
+
+    let username="nekitka_one";
+
+    window.open(`https://t.me/${username}?text=${text}`,"_blank");
 }
 
 /* DESCRIPTION */
@@ -312,7 +320,7 @@ function closePopup(){
     document.getElementById("popup").style.display="none";
 }
 
-/* CART TOGGLE */
+/* CART */
 function toggleCart(){
     document.getElementById("cart").classList.toggle("open");
     document.getElementById("overlay").classList.toggle("show");
