@@ -68,17 +68,6 @@ model-viewer {
     background: #fafafa;
 }
 
-/* PLACEHOLDER */
-.placeholder {
-    height: 220px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f0f0f0;
-    font-size: 14px;
-    color: #666;
-}
-
 /* TEXT */
 .content {
     padding: 15px;
@@ -120,6 +109,17 @@ button {
     display: none;
 }
 
+/* ❌ КРЕСТИК */
+#closeCart {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 26px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #111;
+}
+
 .cart-item {
     padding: 10px 0;
     border-bottom: 1px solid #eee;
@@ -143,9 +143,12 @@ button {
 
 <!-- CART -->
 <div id="cart">
+    <div id="closeCart" onclick="toggleCart()">×</div>
+
     <h3>Корзина</h3>
     <div id="items"></div>
     <p id="total">Итого: 0 ₽</p>
+
     <button id="checkout" onclick="send()">Заказать</button>
 </div>
 
@@ -157,7 +160,7 @@ const tgUser = "nekitka_one";
 let products = [
     {name:"3D Меч", price:1500, model:"https://model.glb"},
     {name:"Дракон", price:2500, model:"https://model.glb"},
-    {name:"Ваза", price:600, model:""} // без фото
+    {name:"Ваза", price:600, model:""}
 ];
 
 let cart = [];
@@ -170,7 +173,9 @@ function render(){
 
         let media = p.model
         ? `<model-viewer src="${p.model}" auto-rotate camera-controls></model-viewer>`
-        : `<div class="placeholder">📦 Нет 3D модели</div>`;
+        : `<div style="height:220px;display:flex;align-items:center;justify-content:center;background:#f0f0f0;">
+            📦 Нет 3D модели
+           </div>`;
 
         html += `
         <div class="card">
@@ -186,13 +191,13 @@ function render(){
     document.getElementById("shop").innerHTML = html;
 }
 
-/* ADD TO CART */
+/* ADD */
 function add(i){
     cart.push(products[i]);
     update();
 }
 
-/* UPDATE CART */
+/* UPDATE */
 function update(){
     document.getElementById("count").innerText = cart.length;
 
