@@ -67,13 +67,6 @@ header {
     color: #666;
 }
 
-.desc {
-    font-size: 13px;
-    color: #555;
-    margin-top: 8px;
-    line-height: 1.4;
-}
-
 .size {
     font-size: 12px;
     color: #444;
@@ -83,13 +76,44 @@ header {
 button {
     margin-top: 10px;
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     border-radius: 10px;
     border: none;
     background: #111;
     color: white;
-    font-weight: 500;
     cursor: pointer;
+}
+
+.descBtn {
+    background: #555;
+    margin-top: 5px;
+}
+
+/* POPUP */
+#popup {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.5);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:2000;
+}
+
+.popupBox {
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    width:300px;
+    text-align:center;
+}
+
+.close {
+    margin-top:10px;
+    background:#ff1e1e;
 }
 
 /* CART */
@@ -103,52 +127,10 @@ button {
     box-shadow: -10px 0 30px rgba(0,0,0,0.1);
     padding: 20px;
     transition: 0.35s;
-    z-index: 999;
 }
 
-#cart.open {
-    right: 0;
-}
+#cart.open { right: 0; }
 
-#overlay {
-    position: fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background: rgba(0,0,0,0.4);
-    opacity:0;
-    visibility:hidden;
-    transition:0.3s;
-    z-index:998;
-}
-
-#overlay.show {
-    opacity:1;
-    visibility:visible;
-}
-
-#closeCart {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 26px;
-    cursor: pointer;
-}
-
-.cart-item {
-    display:flex;
-    justify-content:space-between;
-    padding:10px 0;
-    border-bottom:1px solid #eee;
-}
-
-.del {
-    background:red;
-    padding:5px 8px;
-    border-radius:6px;
-    font-size:12px;
-}
 </style>
 </head>
 
@@ -160,25 +142,24 @@ button {
 
 <div class="container" id="shop"></div>
 
-<div id="overlay" onclick="toggleCart()"></div>
+<!-- POPUP -->
+<div id="popup">
+    <div class="popupBox">
+        <h3 id="pname"></h3>
+        <p id="pdesc"></p>
+        <div id="psize"></div>
+        <button class="close" onclick="closePopup()">Закрыть</button>
+    </div>
+</div>
 
 <!-- CART -->
-<div id="cart">
-    <div id="closeCart" onclick="toggleCart()">×</div>
-
-    <h3>Корзина</h3>
-    <div id="items"></div>
-    <p id="total">Итого: 0 ₽</p>
-
-    <button style="background:#1faa00;" onclick="send()">Заказать</button>
-    <button style="background:#ff1e1e;" onclick="clearCart()">Очистить корзину</button>
-</div>
+<div id="cart"></div>
 
 <script>
 
 const tgUser = "nekitka_one";
 
-/* 🧠 ТОВАРЫ БЕЗ ФОТО */
+/* 🧠 ТОВАРЫ */
 let products = [
     {
         name: "Ваза спиралевидная",
@@ -190,17 +171,12 @@ let products = [
         name: "Бюст Сталина",
         price: 1200,
         desc: "Классический мраморный бюст с гладкой поверхностью.",
-        size: "150 × 250 × 100 мм"
+        size: "176 × 128 × 245 мм"
     }
 ];
 
-let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+let cart = [];
 
-function saveCart(){
-    localStorage.setItem("cart", JSON.stringify(cart));
-}
-
-/* RENDER */
 function render(){
     let html = "";
 
@@ -208,84 +184,40 @@ function render(){
         html += `
         <div class="card">
             <div class="title">${p.name}</div>
-
-            <div class="desc">${p.desc}</div>
-
+            <div class="price">${p.price} ₽</div>
             <div class="size">📏 ${p.size}</div>
 
-            <div class="price">${p.price} ₽</div>
-
             <button onclick="add(${i})">В корзину</button>
+            <button class="descBtn" onclick="showDesc(${i})">Описание</button>
         </div>`;
     });
 
     document.getElementById("shop").innerHTML = html;
 }
 
-/* ADD */
-function add(i){
-    cart.push(products[i]);
-    saveCart();
-    update();
+/* POPUP */
+function showDesc(i){
+    document.getElementById("popup").style.display="flex";
+    document.getElementById("pname").innerText = products[i].name;
+    document.getElementById("pdesc").innerText = products[i].desc;
+    document.getElementById("psize").innerText = "📏 " + products[i].size;
 }
 
-/* REMOVE */
-function removeItem(i){
-    cart.splice(i,1);
-    saveCart();
-    update();
-}
-
-/* CLEAR */
-function clearCart(){
-    cart = [];
-    saveCart();
-    update();
-}
-
-/* UPDATE */
-function update(){
-    document.getElementById("count").innerText = cart.length;
-
-    let html = "";
-    let sum = 0;
-
-    cart.forEach((p,i)=>{
-        sum += p.price;
-        html += `
-        <div class="cart-item">
-            ${p.name} — ${p.price} ₽
-            <button class="del" onclick="removeItem(${i})">×</button>
-        </div>`;
-    });
-
-    document.getElementById("items").innerHTML = html;
-    document.getElementById("total").innerText = "Итого: " + sum + " ₽";
+function closePopup(){
+    document.getElementById("popup").style.display="none";
 }
 
 /* CART */
-function toggleCart(){
-    document.getElementById("cart").classList.toggle("open");
-    document.getElementById("overlay").classList.toggle("show");
+function add(i){
+    cart.push(products[i]);
+    document.getElementById("count").innerText = cart.length;
 }
 
-/* ORDER */
-function send(){
-    let text = "Заказ:%0A";
-    let sum = 0;
-
-    cart.forEach(p=>{
-        text += "- " + p.name + " (" + p.price + "₽)%0A";
-        sum += p.price;
-    });
-
-    text += "%0AИтого: " + sum + "₽";
-
-    window.open("https://t.me/" + tgUser + "?text=" + text, "_blank");
+function toggleCart(){
+    alert("Корзина пока упрощённая в этой версии 👍");
 }
 
 render();
-update();
 
 </script>
 
