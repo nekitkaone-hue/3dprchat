@@ -6,14 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
+body{
     margin:0;
-    font-family: Arial;
+    font-family:Arial;
     background:#f6f7fb;
 }
 
-header {
-    position: sticky;
+header{
+    position:sticky;
     top:0;
     background:white;
     padding:16px;
@@ -21,21 +21,21 @@ header {
     border-bottom:1px solid #eee;
 }
 
-.container {
+.container{
     padding:15px;
     display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
     gap:12px;
 }
 
-.card {
+.card{
     background:white;
     padding:14px;
     border-radius:14px;
     box-shadow:0 6px 18px rgba(0,0,0,0.08);
 }
 
-button {
+button{
     width:100%;
     margin-top:6px;
     padding:8px;
@@ -44,11 +44,11 @@ button {
     cursor:pointer;
 }
 
-.add { background:green; color:white; }
-.desc { background:#4da6ff; color:white; }
+.add{background:green;color:white;}
+.desc{background:#4da6ff;color:white;}
 
-/* CART */
-#cartBtn {
+/* CART BTN */
+#cartBtn{
     position:fixed;
     right:15px;
     top:15px;
@@ -58,7 +58,8 @@ button {
     border-radius:12px;
 }
 
-#cart {
+/* CART */
+#cart{
     position:fixed;
     right:-380px;
     top:0;
@@ -66,44 +67,55 @@ button {
     height:100%;
     background:white;
     padding:15px;
-    transition:0.3s;
+    transition:.3s;
     overflow:auto;
 }
 
-#cart.open { right:0; }
+#cart.open{right:0;}
 
-.item {
+.item{
     display:flex;
     justify-content:space-between;
     align-items:center;
     padding:10px 0;
     border-bottom:1px solid #eee;
-    font-size:14px;
 }
 
-.qty {
+/* FIX CENTER CONTROLS */
+.qty{
     display:flex;
-    gap:5px;
     align-items:center;
+    gap:6px;
 }
 
-.qty button {
-    width:22px;
-    height:22px;
-    font-size:14px;
+.qty button{
+    width:26px;
+    height:26px;
+    font-size:16px;
     background:#eee;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
-.del {
-    width:22px;
-    height:22px;
+/* small delete */
+.del{
+    width:24px;
+    height:24px;
+    font-size:12px;
     background:red;
     color:white;
-    font-size:12px;
+}
+
+/* PAY BUTTON */
+.pay{
+    background:#111;
+    color:white;
+    margin-top:10px;
 }
 
 /* overlay */
-#overlay {
+#overlay{
     position:fixed;
     inset:0;
     background:rgba(0,0,0,0.35);
@@ -111,26 +123,9 @@ button {
     visibility:hidden;
 }
 
-#overlay.show {
+#overlay.show{
     opacity:1;
     visibility:visible;
-}
-
-/* popup */
-#popup {
-    position:fixed;
-    inset:0;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,0.5);
-}
-
-.popupBox {
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    width:280px;
 }
 </style>
 </head>
@@ -149,45 +144,35 @@ button {
     <h3>Корзина</h3>
     <div id="items"></div>
     <p id="total">Итого: 0 ₽</p>
-</div>
 
-<!-- POPUP -->
-<div id="popup">
-    <div class="popupBox">
-        <h3 id="pname"></h3>
-        <p id="pdesc"></p>
-        <p id="psize"></p>
-        <button onclick="closePopup()">Закрыть</button>
-    </div>
+    <!-- 🔥 PAY BUTTON RETURNED -->
+    <button class="pay" onclick="pay()">Оформить заказ</button>
 </div>
 
 <script>
 
-/* PRODUCTS (ВЫПРАВЛЕНО — ВСЕ ЧИСЛА ЧИСЛАМИ) */
-let products = [
-    {name:"Ваза спираль", price:600, desc:"Декоративная ваза", size:"140×139×219 мм"},
-    {name:"Бюст Сталина", price:1200, desc:"Классический бюст", size:"176×128×245 мм"},
-    {name:"Ваза сердце", price:360, desc:"Форма сердца", size:"200×70 мм"}
+let products=[
+    {name:"Ваза спираль",price:600,desc:"Ваза",size:"140×139×219 мм"},
+    {name:"Бюст Сталина",price:1200,desc:"Бюст",size:"176×128×245 мм"},
+    {name:"Ваза сердце",price:360,desc:"Сердце",size:"200×70 мм"}
 ];
 
-let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+let cart=JSON.parse(localStorage.getItem("cart")||"[]");
 
-/* SAVE */
 function save(){
-    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem("cart",JSON.stringify(cart));
 }
 
-/* ADD */
 function add(i){
-    let item = cart.find(p => p.id === i);
+    let f=cart.find(p=>p.id===i);
 
-    if(item){
-        item.qty += 1;
-    } else {
+    if(f){
+        f.qty++;
+    }else{
         cart.push({
             id:i,
             name:products[i].name,
-            price:Number(products[i].price), // 🔥 FIX NaN
+            price:Number(products[i].price),
             qty:1
         });
     }
@@ -196,7 +181,6 @@ function add(i){
     update();
 }
 
-/* PLUS MINUS */
 function plus(i){
     cart[i].qty++;
     save();
@@ -205,9 +189,7 @@ function plus(i){
 
 function minus(i){
     cart[i].qty--;
-    if(cart[i].qty <= 0){
-        cart.splice(i,1);
-    }
+    if(cart[i].qty<=0) cart.splice(i,1);
     save();
     update();
 }
@@ -218,7 +200,6 @@ function remove(i){
     update();
 }
 
-/* RENDER SHOP */
 function render(){
     let html="";
     products.forEach((p,i)=>{
@@ -226,32 +207,31 @@ function render(){
         <div class="card">
             <b>${p.name}</b><br>
             ${p.price} ₽
-
             <button class="add" onclick="add(${i})">В корзину</button>
-            <button class="desc" onclick="show(${i})">Описание</button>
+            <button class="desc" onclick="alert('${p.desc}\\n${p.size}')">Описание</button>
         </div>`;
     });
     document.getElementById("shop").innerHTML=html;
 }
 
-/* UPDATE CART (FIX NaN) */
+/* UPDATE FIXED */
 function update(){
     let html="";
     let sum=0;
     let count=0;
 
     cart.forEach((p,i)=>{
-        let price = Number(p.price) || 0; // 🔥 FIX
-        let qty = Number(p.qty) || 0;
+        let price=Number(p.price)||0;
+        let qty=Number(p.qty)||0;
 
-        sum += price * qty;
-        count += qty;
+        sum+=price*qty;
+        count+=qty;
 
         html+=`
         <div class="item">
             <div>
                 ${p.name}<br>
-                <b>${price * qty} ₽</b>
+                <b>${price*qty} ₽</b>
             </div>
 
             <div class="qty">
@@ -268,22 +248,14 @@ function update(){
     document.getElementById("count").innerText=count;
 }
 
-/* CART */
+/* PAY FUNCTION */
+function pay(){
+    alert("Заказ оформлен (заглушка)");
+}
+
 function toggleCart(){
     document.getElementById("cart").classList.toggle("open");
     document.getElementById("overlay").classList.toggle("show");
-}
-
-/* POPUP */
-function show(i){
-    document.getElementById("popup").style.display="flex";
-    document.getElementById("pname").innerText=products[i].name;
-    document.getElementById("pdesc").innerText=products[i].desc;
-    document.getElementById("psize").innerText=products[i].size;
-}
-
-function closePopup(){
-    document.getElementById("popup").style.display="none";
 }
 
 render();
