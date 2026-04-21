@@ -47,7 +47,7 @@ button{
 .add{background:green;color:white;}
 .desc{background:#4da6ff;color:white;}
 
-/* CART BTN */
+/* CART BUTTON */
 #cartBtn{
     position:fixed;
     right:15px;
@@ -81,7 +81,7 @@ button{
     border-bottom:1px solid #eee;
 }
 
-/* FIX CENTER CONTROLS */
+/* qty */
 .qty{
     display:flex;
     align-items:center;
@@ -98,18 +98,18 @@ button{
     justify-content:center;
 }
 
-/* small delete */
+/* 🔴 DELETE BUTTON FIX */
 .del{
     width:24px;
     height:24px;
     font-size:12px;
-    background:red;
+    background:#ff3b30; /* ярко-красный */
     color:white;
 }
 
-/* PAY BUTTON */
-.pay{
-    background:#111;
+/* CLEAR CART BUTTON */
+.clear{
+    background:#ff3b30;
     color:white;
     margin-top:10px;
 }
@@ -145,16 +145,18 @@ button{
     <div id="items"></div>
     <p id="total">Итого: 0 ₽</p>
 
-    <!-- 🔥 PAY BUTTON RETURNED -->
-    <button class="pay" onclick="pay()">Оформить заказ</button>
+    <!-- 🔴 CLEAR RESTORED -->
+    <button class="clear" onclick="clearCart()">Очистить корзину</button>
+
+    <button style="background:#111;color:white;margin-top:8px;" onclick="pay()">Оформить заказ</button>
 </div>
 
 <script>
 
 let products=[
     {name:"Ваза спираль",price:600,desc:"Ваза",size:"140×139×219 мм"},
-    {name:"Бюст Сталина",price:1200,desc:"Бюст",size:"176×128×245 мм"},
-    {name:"Ваза сердце",price:360,desc:"Сердце",size:"200×70 мм"}
+    {name:"Бюст Сталина",price:1200,desc:"Бюст",size:"176×128×245 mm"},
+    {name:"Ваза сердце",price:360,desc:"Сердце",size:"200×70 mm"}
 ];
 
 let cart=JSON.parse(localStorage.getItem("cart")||"[]");
@@ -194,8 +196,16 @@ function minus(i){
     update();
 }
 
+/* 🔴 DELETE ITEM */
 function remove(i){
     cart.splice(i,1);
+    save();
+    update();
+}
+
+/* 🔴 CLEAR CART */
+function clearCart(){
+    cart=[];
     save();
     update();
 }
@@ -214,7 +224,7 @@ function render(){
     document.getElementById("shop").innerHTML=html;
 }
 
-/* UPDATE FIXED */
+/* UPDATE */
 function update(){
     let html="";
     let sum=0;
@@ -248,14 +258,13 @@ function update(){
     document.getElementById("count").innerText=count;
 }
 
-/* PAY FUNCTION */
-function pay(){
-    alert("Заказ оформлен (заглушка)");
-}
-
 function toggleCart(){
     document.getElementById("cart").classList.toggle("open");
     document.getElementById("overlay").classList.toggle("show");
+}
+
+function pay(){
+    alert("Заказ оформлен (заглушка)");
 }
 
 render();
