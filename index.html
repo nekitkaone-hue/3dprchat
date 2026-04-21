@@ -12,7 +12,6 @@ body{
     background:#f6f7fb;
 }
 
-/* HEADER */
 header{
     position:sticky;
     top:0;
@@ -75,7 +74,7 @@ button{
 
 #cart.open{right:0;}
 
-/* CART HEADER ROW */
+/* CART HEADER */
 .cartTop{
     display:flex;
     justify-content:space-between;
@@ -83,7 +82,6 @@ button{
     margin-bottom:10px;
 }
 
-/* CLEAR BUTTON (TOP RIGHT) */
 .clearTop{
     background:#ff3b30;
     color:white;
@@ -101,29 +99,18 @@ button{
     border-bottom:1px solid #eee;
 }
 
+/* QTY */
 .qty{
     display:flex;
     align-items:center;
     gap:5px;
 }
 
-/* 🔥 + / - GREEN */
+/* + / - GREEN */
 .qty button{
     width:26px;
     height:26px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#2ecc71; /* GREEN */
-    color:white;
-    font-weight:bold;
-}
-
-/* 🔴 DELETE */
-.del{
-    width:26px;
-    height:26px;
-    background:#ff3b30;
+    background:#2ecc71;
     color:white;
     font-weight:bold;
 }
@@ -182,8 +169,6 @@ button{
 
     <div class="cartTop">
         <h3 style="margin:0;">Корзина</h3>
-
-        <!-- 🔥 MOVED CLEAR BUTTON -->
         <button class="clearTop" onclick="clearCart()">Очистить</button>
     </div>
 
@@ -214,7 +199,7 @@ let products=[
 let cart=JSON.parse(localStorage.getItem("cart")||"[]");
 
 /* FIX DATA */
-cart = (cart||[]).map(p=>({
+cart=(cart||[]).map(p=>({
     id:p.id??0,
     name:p.name??"Товар",
     price:Number(p.price)||0,
@@ -258,12 +243,9 @@ function minus(i){
     update();
 }
 
-function remove(i){
-    cart.splice(i,1);
-    save();
-    update();
-}
+/* NO ITEM DELETE BUTTON ANYMORE */
 
+/* CLEAR */
 function clearCart(){
     cart=[];
     save();
@@ -310,7 +292,6 @@ function update(){
                 <button onclick="minus(${i})">-</button>
                 ${qty}
                 <button onclick="plus(${i})">+</button>
-                <button class="del" onclick="remove(${i})">×</button>
             </div>
         </div>`;
     });
