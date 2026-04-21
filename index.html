@@ -10,55 +10,46 @@
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     background: #f5f5f7;
     color: #111;
 }
 
-/* INFO */
-#info {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    background: rgba(0,0,0,0.85);
-    color: white;
-    font-size: 12px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    z-index: 999;
-    line-height: 1.4;
-}
-
 /* HEADER */
 header {
-    padding: 25px;
+    padding: 20px;
     text-align: center;
-    font-size: 30px;
+    font-size: 28px;
     font-weight: bold;
-    letter-spacing: 2px;
     background: white;
     border-bottom: 1px solid #ddd;
 }
 
-/* GRID */
-.container {
-    padding: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 25px;
+/* CART BUTTON */
+#cartBtn {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: black;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
-/* CARD */
+/* GRID */
+.container {
+    padding: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
 .card {
     background: white;
     border-radius: 15px;
     padding: 15px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: translateY(-5px);
 }
 
 model-viewer {
@@ -66,14 +57,6 @@ model-viewer {
     height: 220px;
     border-radius: 12px;
     background: #eee;
-}
-
-h3 {
-    margin: 10px 0 5px;
-}
-
-p {
-    color: #666;
 }
 
 button {
@@ -87,64 +70,135 @@ button {
     cursor: pointer;
 }
 
-button:hover {
-    background: #333;
+/* CART PANEL */
+#cart {
+    display: none;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 320px;
+    height: 100%;
+    background: white;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.2);
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.cart-item {
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
+
+.small-btn {
+    background: red;
+    padding: 5px;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+#checkout {
+    background: green;
+    margin-top: 15px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- INFO -->
-<div id="info">
-    📦 Заказы через:<br>
-    Telegram / WhatsApp / Max
-</div>
-
 <header>NEON || 3D Печать</header>
+
+<div id="cartBtn" onclick="toggleCart()">
+🛒 <span id="count">0</span>
+</div>
 
 <div class="container" id="shop"></div>
 
+<!-- CART -->
+<div id="cart">
+    <h3>Корзина</h3>
+    <div id="cartItems"></div>
+    <h4 id="total">Итого: €0</h4>
+    <button id="checkout" onclick="sendOrder()">Заказать</button>
+</div>
+
 <script>
 
-/* 🧠 ТВОЙ TELEGRAM */
 const tgUser = "nekitka_one";
 
 /* 🛍 ТОВАРЫ */
 let products = [
-    {
-        name: "3D Меч",
-        price: "15",
-        model: "https://model.glb"
-    },
-    {
-        name: "Фигурка Дракона",
-        price: "25",
-        model: "https://model.glb"
-    }
+    {name:"3D Меч", price:15, model:"https://model.glb"},
+    {name:"Дракон", price:25, model:"https://model.glb"}
 ];
 
+let cart = [];
+
+/* SHOP */
 function renderShop(){
     let html = "";
 
-    products.forEach(p=>{
+    products.forEach((p,i)=>{
         html += `
         <div class="card">
             <model-viewer src="${p.model}" auto-rotate camera-controls></model-viewer>
             <h3>${p.name}</h3>
             <p>€${p.price}</p>
-            <button onclick="order('${p.name}')">Заказать</button>
+            <button onclick="addToCart(${i})">В корзину</button>
         </div>`;
     });
 
     document.getElementById("shop").innerHTML = html;
 }
 
-/* 📩 ЗАКАЗ В TELEGRAM */
-function order(name){
-    window.open(
-        "https://t.me/" + tgUser + "?text=Хочу заказать: " + name
-    );
+/* CART */
+function addToCart(i){
+    cart.push(products[i]);
+    updateCart();
+}
+
+function removeItem(i){
+    cart.splice(i,1);
+    updateCart();
+}
+
+function updateCart(){
+    document.getElementById("count").innerText = cart.length;
+
+    let html = "";
+    let total = 0;
+
+    cart.forEach((p,i)=>{
+        total += p.price;
+        html += `
+        <div class="cart-item">
+            <b>${p.name}</b> - €${p.price}
+            <button class="small-btn" onclick="removeItem(${i})">Удалить</button>
+        </div>`;
+    });
+
+    document.getElementById("cartItems").innerHTML = html;
+    document.getElementById("total").innerText = "Итого: €" + total;
+}
+
+/* SHOW CART */
+function toggleCart(){
+    let c = document.getElementById("cart");
+    c.style.display = c.style.display === "block" ? "none" : "block";
+}
+
+/* ORDER */
+function sendOrder(){
+    let text = "Хочу заказать:%0A";
+    let total = 0;
+
+    cart.forEach(p=>{
+        text += "- " + p.name + " (€" + p.price + ")%0A";
+        total += p.price;
+    });
+
+    text += "%0AИтого: €" + total;
+
+    window.open("https://t.me/" + tgUser + "?text=" + text, "_blank");
 }
 
 renderShop();
