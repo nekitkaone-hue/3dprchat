@@ -37,6 +37,7 @@ header {
     padding: 10px 14px;
     border-radius: 12px;
     cursor: pointer;
+    z-index: 1000;
 }
 
 /* GRID */
@@ -96,20 +97,38 @@ button {
     cursor: pointer;
 }
 
-/* CART */
+/* 🔳 OVERLAY */
+#overlay {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    z-index: 998;
+}
+
+/* 🛒 CART (анимация как slide) */
 #cart {
     position: fixed;
-    right: 0;
+    right: -400px;
     top: 0;
     width: 340px;
     height: 100%;
     background: white;
     box-shadow: -10px 0 30px rgba(0,0,0,0.1);
     padding: 20px;
-    display: none;
+    transition: 0.3s ease;
+    z-index: 999;
 }
 
-/* ❌ КРЕСТИК */
+/* OPEN STATE */
+#cart.open {
+    right: 0;
+}
+
+/* ❌ CLOSE */
 #closeCart {
     position: absolute;
     top: 10px;
@@ -117,7 +136,6 @@ button {
     font-size: 26px;
     cursor: pointer;
     font-weight: bold;
-    color: #111;
 }
 
 .cart-item {
@@ -141,6 +159,8 @@ button {
 
 <div class="container" id="shop"></div>
 
+<div id="overlay" onclick="toggleCart()"></div>
+
 <!-- CART -->
 <div id="cart">
     <div id="closeCart" onclick="toggleCart()">×</div>
@@ -163,7 +183,13 @@ let products = [
     {name:"Ваза", price:600, model:""}
 ];
 
-let cart = [];
+/* 🧠 LOAD CART */
+let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+/* SAVE CART */
+function saveCart(){
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
 
 /* SHOP */
 function render(){
@@ -194,6 +220,7 @@ function render(){
 /* ADD */
 function add(i){
     cart.push(products[i]);
+    saveCart();
     update();
 }
 
@@ -213,10 +240,18 @@ function update(){
     document.getElementById("total").innerText = "Итого: " + sum + " ₽";
 }
 
-/* TOGGLE CART */
+/* CART TOGGLE */
 function toggleCart(){
-    let c = document.getElementById("cart");
-    c.style.display = c.style.display === "block" ? "none" : "block";
+    let cartEl = document.getElementById("cart");
+    let overlay = document.getElementById("overlay");
+
+    cartEl.classList.toggle("open");
+
+    if(cartEl.classList.contains("open")){
+        overlay.style.display = "block";
+    } else {
+        overlay.style.display = "none";
+    }
 }
 
 /* ORDER */
@@ -234,7 +269,9 @@ function send(){
     window.open("https://t.me/" + tgUser + "?text=" + text, "_blank");
 }
 
+/* INIT */
 render();
+update();
 
 </script>
 
