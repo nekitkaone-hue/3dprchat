@@ -1,1 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Товар</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<style>
+body { font-family: Arial; margin:0; background:#f6f6f6; }
+
+.box {
+  max-width:600px;
+  margin:40px auto;
+  background:white;
+  padding:20px;
+  border-radius:12px;
+}
+
+button {
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:#1faa00;
+  color:white;
+  cursor:pointer;
+}
+
+.back {
+  background:#444;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2 id="name"></h2>
+  <p id="desc"></p>
+  <p id="size"></p>
+  <h3 id="price"></h3>
+
+  <button onclick="add()">В корзину</button>
+  <button class="back" onclick="goBack()">Назад</button>
+</div>
+
+<script>
+
+let products = {
+  1:{
+    name:"Ваза спиралевидная",
+    price:600,
+    desc:"Современная декоративная 3D ваза.",
+    size:"140 × 139 × 219 мм"
+  },
+  2:{
+    name:"Бюст Сталина",
+    price:1200,
+    desc:"Классический мраморный бюст.",
+    size:"176 × 128 × 245 мм"
+  }
+};
+
+let params = new URLSearchParams(window.location.search);
+let id = params.get("id");
+
+let p = products[id];
+
+document.getElementById("name").innerText = p.name;
+document.getElementById("desc").innerText = p.desc;
+document.getElementById("size").innerText = "📏 " + p.size;
+document.getElementById("price").innerText = p.price + " ₽";
+
+function add(){
+  let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  cart.push(p);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert("Добавлено в корзину");
+}
+
+function goBack(){
+  window.location.href = "index.html";
+}
+
+</script>
+
+</body>
+</html>
