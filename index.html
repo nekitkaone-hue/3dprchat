@@ -2,115 +2,136 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>NEON || 3D Печать</title>
+<title>NEON 3D</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#ffffff">
 
 <style>
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial;
+    font-family: Arial;
     background: #f6f7fb;
 }
 
-/* лёгкий фон */
-body::before {
-    content:"";
-    position:fixed;
-    inset:-20%;
-    background:
-        radial-gradient(circle at 20% 20%, rgba(120,160,255,0.10), transparent 40%),
-        radial-gradient(circle at 80% 30%, rgba(180,200,255,0.10), transparent 45%);
-    z-index:-1;
-}
-
-/* header */
 header {
     position: sticky;
     top: 0;
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(10px);
-    padding: 18px;
-    font-size: 18px;
+    background: white;
+    padding: 15px;
     font-weight: 600;
     border-bottom: 1px solid #eee;
 }
 
-/* grid */
 .container {
-    padding: 20px;
+    padding: 15px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
+    gap: 10px;
 }
 
-/* card */
 .card {
     background: white;
-    border-radius: 16px;
-    padding: 14px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    padding: 12px;
+    border-radius: 14px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
 }
 
-/* buttons */
 button {
     width: 100%;
-    padding: 10px;
-    margin-top: 6px;
+    margin-top: 5px;
+    padding: 8px;
     border: none;
     border-radius: 10px;
 }
 
-.add { background:#1faa00; color:white; }
-.desc { background:#4da6ff; color:white; }
+.add { background: green; color: white; }
+.desc { background: #4da6ff; color: white; }
 
 #cartBtn {
     position: fixed;
-    right: 15px;
     top: 15px;
-    background: #111;
+    right: 15px;
+    background: black;
     color: white;
-    padding: 10px 12px;
+    padding: 10px;
     border-radius: 12px;
+    z-index: 999;
+}
+
+/* CART */
+#cart {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 320px;
+    height: 100%;
+    background: white;
+    transition: 0.3s;
+    padding: 15px;
+    z-index: 1000;
+}
+
+#cart.open {
+    right: 0;
+}
+
+#overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    opacity: 0;
+    visibility: hidden;
+}
+
+#overlay.show {
+    opacity: 1;
+    visibility: visible;
 }
 </style>
 </head>
 
 <body>
 
-<header>NEON 3D PRINT</header>
+<header>NEON 3D</header>
 
-<div id="cartBtn">🛒 <span id="count">0</span></div>
+<div id="cartBtn" onclick="toggleCart()">🛒 <span id="count">0</span></div>
+<div id="overlay" onclick="toggleCart()"></div>
 
 <div class="container" id="shop"></div>
 
+<!-- CART -->
+<div id="cart">
+    <h3>Корзина</h3>
+    <div id="items"></div>
+    <p id="total"></p>
+    <button onclick="clearCart()" style="background:red;color:white;">Очистить</button>
+</div>
+
+<!-- POPUP -->
+<div id="popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;">
+    <div style="background:white;padding:20px;border-radius:12px;width:280px;">
+        <h3 id="pname"></h3>
+        <p id="pdesc"></p>
+        <p id="psize"></p>
+        <button onclick="closePopup()">Закрыть</button>
+    </div>
+</div>
+
 <script>
 
-const products = [
-    {
-        name:"Ваза спираль",
-        price:600,
-        desc:"Декоративная ваза",
-        size:"140×139×219 мм"
-    },
-    {
-        name:"Бюст Сталина",
-        price:1200,
-        desc:"Классический бюст",
-        size:"176×128×245 мм"
-    },
-    {
-        name:"Ваза Сердце",
-        price:360,
-        desc:"Форма сердца",
-        size:"200×70 мм"
-    }
+let products = [
+    {name:"Ваза", price:600, desc:"Ваза", size:"140 мм"},
+    {name:"Сталина бюст", price:1200, desc:"Бюст", size:"245 мм"},
+    {name:"Ваза сердце", price:360, desc:"Сердце", size:"200x70"}
 ];
 
-let cart = [];
+let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+function save(){
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
 
 function render(){
     let html="";
@@ -120,7 +141,7 @@ function render(){
             <b>${p.name}</b><br>
             ${p.price} ₽
             <button class="add" onclick="add(${i})">В корзину</button>
-            <button class="desc" onclick="alert('${p.desc}\\n${p.size}')">Описание</button>
+            <button class="desc" onclick="show(${i})">Описание</button>
         </div>`;
     });
     document.getElementById("shop").innerHTML=html;
@@ -128,15 +149,54 @@ function render(){
 
 function add(i){
     cart.push(products[i]);
-    document.getElementById("count").innerText=cart.length;
+    save();
+    update();
 }
 
-/* PWA SERVICE WORKER */
-if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js');
+function update(){
+    document.getElementById("count").innerText=cart.length;
+
+    let html="";
+    let sum=0;
+
+    cart.forEach(p=>{
+        sum+=p.price;
+        html+=`<div>${p.name}</div>`;
+    });
+
+    document.getElementById("items").innerHTML=html;
+    document.getElementById("total").innerText="Итого: "+sum+" ₽";
+}
+
+function clearCart(){
+    cart=[];
+    save();
+    update();
+}
+
+function toggleCart(){
+    document.getElementById("cart").classList.toggle("open");
+    document.getElementById("overlay").classList.toggle("show");
+}
+
+function show(i){
+    document.getElementById("popup").style.display="flex";
+    document.getElementById("pname").innerText=products[i].name;
+    document.getElementById("pdesc").innerText=products[i].desc;
+    document.getElementById("psize").innerText=products[i].size;
+}
+
+function closePopup(){
+    document.getElementById("popup").style.display="none";
+}
+
+/* PWA FIX */
+if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js");
 }
 
 render();
+update();
 
 </script>
 
